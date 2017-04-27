@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework 2</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <link rel="stylesheet" href="./main.css">
+  <style>
+    div#randNum {
+      font-size: 50px;
+      width: 150px;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #737373;
+      color: white;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="head">HOMEWORK 2</div>
+  <div class="container">
+    <div id="randNum">OωO</div>
+    <input type="button" onclick="launch()" value="啟動">
+
+    <hr>
+
+    <svg id="note" width="300" height="200"></svg>
+
+    <hr>
+
+    <svg id="bar" width="350" height="240"></svg>
+
+    <hr>
+
+    <svg id="line" width="350" height="300"></svg>
+  </div>
+  <div class="footer">
+    <a href="./index.html">&lt;&lt; Return to index</a>
+  </div>
+
+  <script>
+    function random(n,m){
+        return Math.ceil(Math.random()*(m-n)+n);
+    }
+    function launch(){
+      d3.select('#randNum').text(random(1911, 2016));
+    }
+
+    // 音符
+    var tgt = d3.select('svg#note');
+    tgt.append("rect").attr({ x: 0, y: 0, width: 300, height: 200, fill: "OldLace" });
+    for(var i=0; i<5; i++){
+      tgt.append("line").attr({ x1: 0, y1: 45+30*i, x2: 300, y2: 45+30*i, stroke: "black" });
+    }
+    tgt.append("circle").attr({ cx: 150, cy: 120, r: 15 });
+    tgt.append("rect").attr({ x: 160, y: 45, width: 5, height: 78 });
+    tgt.append("text").attr({ x: 140, y: 200, "font-size": 40 }).text("A");
+
+    // bar chart
+    tgt = d3.select('svg#bar');
+    for(var i=0; i<20; i++){
+      var curNum = random(20, 300);
+      tgt.append("rect").attr({ x: 0, y: 12*i, width: curNum, height: 10, fill: "red" });
+      tgt.append("text").attr({ x: curNum+15, y: 9+12*i, "font-size": 12 }).text(curNum);
+    }
+
+    // line chart
+    tgt = d3.select('svg#line');
+    var points = "0,0"
+    for(var i=0; i<20; i++){
+      var curNum = random(20, 300);
+      points += " " + curNum + "," + 12*(i+1);
+      tgt.append("circle").attr({ cx: curNum, cy: 12*(i+1), r: 4, fill: "red" });
+      tgt.append("text").attr({ x: curNum+10, y: 5+12*(i+1), "font-size": 12 }).text(curNum);
+    }
+    points += " 0,240";
+    tgt.append("polyline").attr({ points: points, stroke: "black", fill: "transparent" });
+  </script>
+</body>
+</html>
