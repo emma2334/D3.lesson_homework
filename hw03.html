@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework 3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+  <div class="head">HOMEWORK 3</div>
+  <div class="container">
+    <svg width="900" height="300"></svg>
+
+    <hr>
+
+    <div id="selective"></div>
+
+    <hr>
+
+    <svg id="bar" width="100%" height="200"></svg>
+    <input type="button" value="新增" onclick="update()">
+    <input type="button" value="移除" onclick="remove()">
+  </div>
+  <div class="footer">
+    <a href="./index.html">&lt;&lt; Return to index</a>
+  </div>
+
+  <script>
+    // invoice
+    d3.json("./data/invoice-taipei.json", function(dataSet){
+      var svg = d3.select("svg");
+      var fDataSet = dataSet.filter(function(d){
+        return d.amount>1000000000 && d.date==="2016/8/1" && d.cid==="A";
+      });
+      var scale = d3.scale.linear().domain([0, 1000000000]).range([0, 20]);
+      for(var i=0; i<fDataSet.length; i++){
+        svg.append("rect").attr({ x:250, y:20*i, width: scale(fDataSet[i].amount), height: 16, fill: "red" });
+        svg.append("text").attr({ x: 15, y: 15+20*i, "font-size": 12 }).text(fDataSet[i].industry);
+      }
+    });
+
+    // selective render
+    var arr = [85, 60 , 99, 49, 77, 82];
+
+    (function(){
+      bind(arr);
+      render();
+
+      function bind(data){
+        var sel = d3.select("div#selective").selectAll("div").data(data);
+        sel.enter().append("div");
+        sel.exit().remove();
+      }
+
+      function render(){
+        d3.selectAll("#selective div").text(function(d, i){
+          return (i+1) + ": " + d;
+        }).style({
+          color: function(d, i){
+            if(d<70) return "red";
+            else return;
+          }
+        });
+      }
+    })();
+
+    // bar chart
+    var p =50;
+
+    bind(arr);
+    render();
+
+    function bind(data){
+      var sel = d3.select("svg#bar").selectAll("rect").data(data);
+      sel.enter().append("rect");
+      sel.exit().remove();
+
+      var sel_text = d3.select("svg#bar").selectAll("text").data(data);
+      sel_text.enter().append("text");
+      sel_text.exit().remove();
+    }
+
+    function render(){
+      d3.selectAll("#bar rect").attr({
+        x: function(d, i){
+          return p+(40+2)*i;
+        },y: function(d, i){
+          return 200-p-d;
+        }, width: 40,
+        height: function(d, i){
+          return d;
+        }, fill: function(d, i){
+          if(d<70) return "red";
+          else return "lightgreen";
+        }
+      });
+
+      d3.selectAll("#bar text").attr({
+        x: function(d, i){
+          console.log(i);
+          return p+42*i+10;
+        }, y: function(d, i){
+          return 200-p+20;
+        }
+      }).text(function(d){
+        return d;
+      });
+    }
+
+    function random(n,m){
+      return Math.ceil(Math.random()*(m-n)+n);
+    }
+
+    function update(){
+      var num = random(0, 100);
+      arr.push(num);
+      bind(arr);
+      render();
+    }
+
+    function remove(){
+      arr.shift();
+      bind(arr);
+      render();
+    }
+  </script>
+</body>
+</html>
