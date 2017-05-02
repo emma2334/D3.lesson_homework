@@ -19,7 +19,7 @@
 
     <svg id="bar" width="100%" height="200"></svg>
     <input type="button" value="新增" onclick="update()">
-    <input type="button" value="移除" onclick="remove()">
+    <input type="button" value="移除" onclick="dele()">
   </div>
   <div class="footer">
     <a href="./index.html">&lt;&lt; Return to index</a>
@@ -97,7 +97,6 @@
 
       d3.selectAll("#bar text").attr({
         x: function(d, i){
-          console.log(i);
           return p+42*i+10;
         }, y: function(d, i){
           return 200-p+20;
@@ -118,7 +117,7 @@
       render();
     }
 
-    function remove(){
+    function dele(){
       arr.shift();
       bind(arr);
       render();
