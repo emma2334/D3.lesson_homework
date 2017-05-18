@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="https://d3js.org/d3.v3.js"></script>
+  <style>
+    svg {
+      width: 100%;
+      min-width: 900px;
+      height: 600px;
+    }
+
+    .axis path, .axis line{
+      fill: none;
+      stroke: black;
+      shape-rendering: auto;
+    }
+    .axis text{
+      font-size: 12px;
+    }
+    #tooltip{
+      position: absolute;
+      background: #4E4E4E;
+      color: white;
+      height: auto;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    #tooltip.hidden{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <svg id="cancer"></svg>
+  <div id="tooltip" class="hidden"></div>
+  <script>
+  var a;
+    d3.csv("../data/cancer_data.csv", function(dataSet){
+      bind(dataSet);
+      render(dataSet);a=dataSet;
+    });
+
+    function bind(dataSet){
+      var selection = d3.select("#cancer")
+        .selectAll("circle")
+        .data(dataSet);
+      selection.enter().append("circle");
+      selection.exit().remove();
+    }
+
+    function render(dataSet){
+      var svg = d3.select("#cancer");
+      var w = svg.node().getBoundingClientRect().width;
+      var h = svg.node().getBoundingClientRect().height;
+      var padding = 50;
+
+      // get area domain
+      var areaDomain = dataSet.map(function(d){
+        return d["縣市別"];
+      });
+      areaDomain = unique(areaDomain)
+
+      // set up scale
+      var xScale = d3.time.scale()
+        .domain([
+          new Date(d3.min(dataSet, function(d){
+            return new Date(d["癌症診斷年"]);
+          })),
+          new Date(d3.max(dataSet, function(d){
+            return new Date(d["癌症診斷年"]);
+          }))
+        ])
+        .range([padding,w-padding]);
+      var yScale = d3.scale.linear()
+        .domain([0, d3.max(dataSet, function(d){ return +d["平均年齡"]; })])
+        .range([h-padding,padding]);
+      var rScale = d3.scale.linear()
+        .domain([
+          d3.min(dataSet, function(d){
+            return +d["癌症發生數"];
+          }),
+          d3.max(dataSet, function(d){
+            return +d["癌症發生數"];
+          })
+        ])
+        .range([5,20]);
+      var fScale = d3.scale.category20();
+
+      d3.selectAll("circle")
+        .attr({
+          cx: function(d){
+            return xScale(new Date(d["癌症診斷年"]));
+          },
+          cy:function(d){
+            return yScale(+d["平均年齡"]);
+          },
+          r:function(d){
+            return rScale(+d["癌症發生數"]);
+          },
+          fill: function(d){
+            return fScale(areaDomain.indexOf(d["縣市別"]));
+          }
+        })
+        .on("mouseover", function(d){
+          d3.select("#tooltip")
+            .html(`${d["縣市別"]}<br>癌症別：${d["癌症別"]}<br>病例數：${d["癌症發生數"]}<br>平均年齡：${d["平均年齡"]}`)
+            .style({
+              left: `${d3.event.pageX}px`,
+              top: `${d3.event.pageY}px`
+            });
+          d3.select("#tooltip").classed("hidden", false);
+        })
+        .on("mouseout", function(d){
+            d3.select("#tooltip").classed("hidden", true);
+        });
+
+      function unique(array){
+        var n = [];
+        for(var i = 0; i < array.length; i++){
+          if (n.indexOf(array[i]) == -1){
+              n.push(array[i]);
+          }
+        }
+        return n;
+      }
+    }
+  </script>
+</body>
+</html>
