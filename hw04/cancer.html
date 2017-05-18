@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>Cancer</title>
   <script src="https://d3js.org/d3.v3.js"></script>
   <style>
     svg {
@@ -33,7 +33,7 @@
   </style>
 </head>
 <body>
-  癌症別：<select></select>
+  癌症別：<select><option value="顯示全部">顯示全部</option></select>
   <br>
   <svg id="cancer">
     <g class="x axis"></g>
@@ -41,10 +41,9 @@
   </svg>
   <div id="tooltip" class="hidden"></div>
   <script>
-  var a;
     d3.csv("../data/cancer_data.csv", function(dataSet){
       bind(dataSet);
-      render(dataSet);a=dataSet;
+      render(dataSet);
       list(dataSet);
     });
 
@@ -154,8 +153,15 @@
 
       d3.select("select")
         .on("change", function(d){
-          // filter
           var value = d3.select("select").property("value");
+
+          if(value === "顯示全部"){
+            bind(dataSet);
+            render(dataSet);
+            return;
+          }
+
+          // filter
           var newDataSet = dataSet.filter(function(d){
               return d["癌症別"] === value;
           });

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Untitled Document</title>
+    <title>Invoice</title>
     <script src="https://d3js.org/d3.v3.js"></script>
     <style>
         .axis path, .axis line{
@@ -55,7 +55,6 @@
             });
             d3.select("svg").append("g").attr("id","axisX");
             d3.select("svg").append("g").attr("id","axisY");
-            d3.select("body").append("br");
         }
 
         function bind(dataSet){
@@ -151,8 +150,15 @@
             });
 
             //畫出按鈕們
-            var selection = d3.select("body")
-                .append("select")
+            d3.select("body").insert("br", ":first-child");
+
+            d3.select("body")
+                .insert("select", ":first-child")
+                .append("option")
+                .attr("value", "顯示全部")
+                .html("顯示全部")
+
+            var selection = d3.select("select")
                 .selectAll("option")
                 .data(filterIndustryArr);
 
@@ -174,6 +180,11 @@
 
 
             function update(industryName){
+                if(industryName === "顯示全部"){
+                    bind(dataSet);
+                    render(dataSet);
+                    return;
+                }
                 //過濾行業別符合者
                 var newDataSet = dataSet.filter(function(d){
                     return d.industry === industryName;
