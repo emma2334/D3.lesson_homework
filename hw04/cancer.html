@@ -33,19 +33,23 @@
   </style>
 </head>
 <body>
-  <svg id="cancer"></svg>
+  癌症別：<select></select>
+  <br>
+  <svg id="cancer">
+    <g class="x axis"></g>
+    <g class="y axis"></g>
+  </svg>
   <div id="tooltip" class="hidden"></div>
   <script>
   var a;
     d3.csv("../data/cancer_data.csv", function(dataSet){
       bind(dataSet);
       render(dataSet);a=dataSet;
+      list(dataSet);
     });
 
     function bind(dataSet){
       var selection = d3.select("#cancer")
-        .append("g")
-        .attr("class", "circle")
         .selectAll("circle")
         .data(dataSet);
       selection.enter().append("circle");
@@ -62,7 +66,7 @@
       var areaDomain = dataSet.map(function(d){
         return d["縣市別"];
       });
-      areaDomain = unique(areaDomain)
+      areaDomain = unique(areaDomain);
 
       // set up scale
       var xScale = d3.time.scale()
@@ -92,6 +96,8 @@
 
       // draw circles
       d3.selectAll("circle")
+        .transition()
+        .duration(500)
         .attr({
           cx: function(d){
             return xScale(new Date(d["癌症診斷年"]));
@@ -105,7 +111,9 @@
           fill: function(d){
             return fScale(areaDomain.indexOf(d["縣市別"]));
           }
-        })
+        });
+
+      d3.selectAll("circle")
         .on("mouseover", function(d){
           d3.select("#tooltip")
             .html(`${d["縣市別"]}<br>癌症別：${d["癌症別"]}<br>病例數：${d["癌症發生數"]}<br>平均年齡：${d["平均年齡"]}`)
@@ -122,18 +130,39 @@
       // draw axis
       var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
       var yAxis = d3.svg.axis().scale(yScale).orient("left");
-      svg.append("g")
-        .attr({
-          class: "axis x",
-          transform: "translate("+(padding-10)+",0)"
-        })
+      svg.select("g.x.axis")
+        .attr({ transform: "translate("+(padding-10)+",0)" })
         .call(yAxis);
-      svg.append("g")
-        .attr({
-          class: "axis x",
-          transform: "translate(0,"+(h-padding+10)+")"
-        })
+      svg.select("g.y.axis")
+        .attr({ transform: "translate(0,"+(h-padding+10)+")" })
         .call(xAxis);
+    }
+
+    function list(dataSet){
+      var category = dataSet.map(function(d){
+        return d["癌症別"];
+      });
+      category = unique(category);
+
+      d3.select("select")
+        .selectAll("option")
+        .data(category)
+        .enter()
+        .append("option")
+        .attr("value", function(d){ return d })
+        .html(function(d){ return d })
+
+      d3.select("select")
+        .on("change", function(d){
+          // filter
+          var value = d3.select("select").property("value");
+          var newDataSet = dataSet.filter(function(d){
+              return d["癌症別"] === value;
+          });
+
+          bind(newDataSet);
+          render(newDataSet);
+        });
     }
 
     function unique(array){
