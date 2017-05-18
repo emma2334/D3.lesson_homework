@@ -44,6 +44,8 @@
 
     function bind(dataSet){
       var selection = d3.select("#cancer")
+        .append("g")
+        .attr("class", "circle")
         .selectAll("circle")
         .data(dataSet);
       selection.enter().append("circle");
@@ -88,6 +90,7 @@
         .range([5,20]);
       var fScale = d3.scale.category20();
 
+      // draw circles
       d3.selectAll("circle")
         .attr({
           cx: function(d){
@@ -116,15 +119,31 @@
             d3.select("#tooltip").classed("hidden", true);
         });
 
-      function unique(array){
-        var n = [];
-        for(var i = 0; i < array.length; i++){
-          if (n.indexOf(array[i]) == -1){
-              n.push(array[i]);
-          }
+      // draw axis
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+      var yAxis = d3.svg.axis().scale(yScale).orient("left");
+      svg.append("g")
+        .attr({
+          class: "axis x",
+          transform: "translate("+(padding-10)+",0)"
+        })
+        .call(yAxis);
+      svg.append("g")
+        .attr({
+          class: "axis x",
+          transform: "translate(0,"+(h-padding+10)+")"
+        })
+        .call(xAxis);
+    }
+
+    function unique(array){
+      var n = [];
+      for(var i = 0; i < array.length; i++){
+        if (n.indexOf(array[i]) == -1){
+            n.push(array[i]);
         }
-        return n;
       }
+      return n;
     }
   </script>
 </body>
