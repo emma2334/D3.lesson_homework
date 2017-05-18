@@ -16,6 +16,20 @@ div.head {
   padding: 30px;
 }
 
+div.source {
+  color: #828282;
+  margin: 20px 0;
+  font-style: italic;
+  padding-left: 2em;
+  position: relative;
+}
+
+div.source:before {
+  content: "—";
+  position: absolute;
+  left: 0px;
+}
+
 hr {
   margin: 40px 0;
 }
