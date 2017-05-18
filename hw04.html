@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Homework 4</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <link rel="stylesheet" href="./main.css">
+  <style>
+    .axis path, .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="head">HOMEWORK 4</div>
+  <div class="container">
+    <svg id="invoice" width="800" height="300"></svg>
+    <br>
+    不知道為什麼起始的0顯示不出來...
+    <hr>
+    <svg id="party" width="200" height="150"></svg>
+    <!-- <hr>
+    <iframe src="./hw04/2d-Scatter-hw.html" frameborder="0" width="100%" height="650px"></iframe> -->
+    <hr>
+    <iframe src="./hw04/2d-Scatter-part2.html" frameborder="0" width="100%" height="650px"></iframe>
+  </div>
+  <div class="footer">
+    <a href="./index.html">&lt;&lt; Return to index</a>
+  </div>
+  <script>
+    // invoice
+    var dataSet =[{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"不動產開發業","platform":"無載具","number":1530691,"amount":2081432419},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"批發業","platform":"無載具","number":4142289,"amount":5565063958},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"資料處理及資訊供應服務業","platform":"無載具","number":780708,"amount":1359622827},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"零售業","platform":"無載具","number":64927420,"amount":19680973217},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"電信業","platform":"無載具","number":225300,"amount":2302012551},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"餐飲業","platform":"無載具","number":9855745,"amount":5193141219},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"影片服務、聲音錄製及音樂出版業","platform":"使用載具","number":1518980,"amount":2606453896},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"資料處理及資訊供應服務業","platform":"使用載具","number":3936592,"amount":2441866930},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"零售業","platform":"使用載具","number":9675319,"amount":4693713798},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"電信業","platform":"使用載具","number":15939352,"amount":15982550394},{"date":"2016/8/1","city":"臺北市","cid":"A","industry":"電力及燃氣供應業","platform":"使用載具","number":688044,"amount":6096595655}];
+    var scale = d3.scale
+      .linear()
+      .domain([10000000, d3.max(dataSet, function(d){ return d.amount; })])
+      .range([0, 250]);
+
+    bind(dataSet);
+    render();
+
+    function bind(dataSet){
+      var selection = d3.select("#invoice")
+      .selectAll("rect")
+      .data(dataSet);
+      selection.enter().append("rect");
+      selection.exit().remove();
+
+      var selection_text = d3.select("svg")
+      .selectAll("text")
+      .data(dataSet);
+      selection_text.enter().append("text");
+      selection_text.exit().remove();
+    }
+    function render(){
+
+      d3.selectAll("rect")
+        .attr({
+        x: 300,
+        y: function(d,i){
+          return 10+20*i;
+        },
+        width: function(d,i){
+          return scale(d.amount);
+        },
+        height: 18,
+        fill: "red"
+      });
+      d3.selectAll("text")
+        .attr({
+        x: 10,
+        y: function(d,i){
+          return 25+20*i;
+        }
+      }).text(function(d){
+        return d.industry;
+      });
+    }
+
+    // axis
+    var yAxis = d3.svg.axis()
+      .scale(scale)
+      .orient("bottom")
+      .ticks(5)
+      .tickFormat(function(d){
+        return d/1000000000 + "G";
+      });
+    d3.select("#invoice")
+      .append("g")
+      .attr({
+        class: "axis",
+        transform: "translate(300, 250)"
+      })
+      .call(yAxis);
+
+    // party
+    var party = ["中國國民黨", "民主進步黨", "時代力量", "無黨團結聯盟", "親民黨"];
+    var color = ["blue", "green", "yellow", "grey", "orange"];
+    var cScale = d3.scale.ordinal()
+      .domain(party)
+      .range(color);
+
+    var svg = d3.select("#party");
+
+    for(var i=0; i<party.length; i++){
+      svg.append("text")
+        .attr({
+          x: 20,
+          y: 20+22*i,
+          "font-siz": 12,
+          fill: cScale(party[i])
+        })
+        .text(party[i] + " => " + cScale(party[i]));
+    }
+  </script>
+</body>
+</html>
